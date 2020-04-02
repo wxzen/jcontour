@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: wContour.jar wContour.jar slf4j-api-1.7.25.jar log4j-1.2.1
+ 7.jar slf4j-log4j12-1.7.25.jar
+
