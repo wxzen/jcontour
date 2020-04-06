@@ -65,14 +65,6 @@ public class IDWImage {
 
 	private CRSutil crsUtil;
 
-	private double[] mapCenter = {117.661801, 24.510897};
-
-	private int zoom = 8;
-
-	private double clientWidth = 1536d;
-
-	private double clientHeight = 731d;
-
 	private List<Polygon> contourPolygons;
 	private LinkedHashMap<Double, Color> colorMap;
 	private String filePath;
@@ -90,24 +82,14 @@ public class IDWImage {
 		this.right = bounds[1][0];
 		this.top = bounds[1][1];
 
-		int size = rawdata.length;
-		double[] lngs = new double[size];
-		double[] lats = new double[size];
-		double[] vals = new double[size];
-		for (int i = 0, len = rawdata.length; i < len; i++) {
-			lngs[i] = rawdata[i][0];
-			lats[i] = rawdata[i][1];
-			vals[i] = rawdata[i][2];
-		}
-		double[][] _data = { lngs, lats, vals };
 		this.outLine = MapUtils.readMapData(mapDataPath);
 
 		//初始化投影坐标系统
 		double[] mapCenter = (double[]) crsParams.get("mapCenter");
 		double clientWidth = (double) crsParams.get("clientWidth");
-        double clientHeight = (double) crsParams.get("clientHeight");
+		double clientHeight = (double) crsParams.get("clientHeight");
+		int zoom = (int) crsParams.get("zoom");
 		
-
 		crsUtil = new CRSutil(mapCenter, clientWidth, clientHeight, zoom);
 		Point southWestPixel = crsUtil.lngLatToPixelPoint(new LngLat(left, bottom));
 		Point northEastPixel = crsUtil.lngLatToPixelPoint(new LngLat(right, top));
@@ -117,7 +99,7 @@ public class IDWImage {
 		colorDeal(colors);
 
 		//开始插值，生成等值面图片
-		IDWutil idWutil = new IDWutil(_data, colorValues, left, right, top, bottom);
+		IDWutil idWutil = new IDWutil(rawdata, colorValues, left, right, top, bottom);
 		this.contourPolygons = idWutil.interpolate();
 	}
 

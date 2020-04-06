@@ -36,12 +36,42 @@ public class IDWTest {
 		double bottom = 23.391427;
         double top = 25.402349;
 
-        String filePath = "contour/zhangzhou/";
+        String filePath = "contour/city/zhangzhou/";
         
         double[][] bounds = {{left, bottom}, {right, top}};
         List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
         double[][] rawdata = getData(filePath);
-        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "E:/tmp/", filePath, crsParams);
+        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "E:/tmp/zhangzhou", filePath, crsParams);
+        idwImage.draw();
+        
+    }
+
+
+    @Test
+    public void testCountry() {
+        double[] mapCenter = {108.07031303644182, 33.882330753596406};
+        int zoom = 4;
+        double clientWidth = 1536d;
+        double clientHeight = 731d;
+
+        Map<String, Object> crsParams = new HashMap<>();
+        crsParams.put("mapCenter", mapCenter);
+        crsParams.put("zoom", zoom);
+        crsParams.put("clientWidth", clientWidth);
+        crsParams.put("clientHeight", clientHeight);
+        crsParams.put("zoom", zoom);
+
+        double left = 60.42;
+		double right = 152.48;
+		double bottom = 10.01;
+		double top = 57.35;
+
+        String filePath = "contour/country/";
+        
+        double[][] bounds = {{left, bottom}, {right, top}};
+        List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
+        double[][] rawdata = getData(filePath);
+        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "E:/tmp/country", filePath, crsParams);
         idwImage.draw();
         
     }
@@ -49,7 +79,7 @@ public class IDWTest {
 
     public double[][] getData(String path){
         String dataPath = this.getClass().getClassLoader()
-            .getResource(path+".csv").getPath();
+            .getResource(path+"data.csv").getPath();
         List<Map<String, String>> dataList = CsvParser.parse(dataPath);
         double[][] retList = new double[3][dataList.size()];
         for (int i=0; i<dataList.size(); i++) {
@@ -79,6 +109,12 @@ public class IDWTest {
 		return retList;
     }
     
+
+    @Test
+    public void testPath(){
+        String colorPath = this.getClass().getClassLoader().getResource("contour/city/zhangzhou/color.csv").getPath();
+        System.out.println(colorPath);
+    }
 
 
 }
