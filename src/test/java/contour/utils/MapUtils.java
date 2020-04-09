@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import wContour.Global.PointD;
+import contour.draw.spatial.PointD;
 
 /**
  * 读取地图数据

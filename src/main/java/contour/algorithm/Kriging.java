@@ -1,9 +1,11 @@
-package contour.common.kriging;
+package contour.algorithm;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import contour.utils.MathsUtil;
 
 /**
  * Kriging

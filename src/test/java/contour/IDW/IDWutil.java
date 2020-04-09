@@ -1,4 +1,4 @@
-package contour.common.IDW;
+package contour.IDW;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,11 +7,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import wContour.Contour;
-import wContour.Interpolate;
-import wContour.Global.Border;
-import wContour.Global.PolyLine;
-import wContour.Global.Polygon;
+import contour.draw.Contour;
+import contour.draw.spatial.Border;
+import contour.draw.spatial.PolyLine;
+import contour.draw.spatial.Polygon;
+import contour.algorithm.IDW;
 
 /**
  * IDWutil
@@ -49,8 +49,8 @@ public class IDWutil {
         int neighborNumber = colorValues.length - 1;
         
         // 填充数据
-		Interpolate.CreateGridXY_Num(left, bottom, right, top, x, y);
-		double[][] gridData = Interpolate.Interpolation_IDW_Neighbor(
+		IDW.createGridXY_Num(left, bottom, right, top, x, y);
+		double[][] gridData = IDW.interpolation_IDW_Neighbor(
 				data, x, y, neighborNumber, DEFAULT_ALGORITHM_UNDEFINE);
 
 		int nc = colorValues.length;

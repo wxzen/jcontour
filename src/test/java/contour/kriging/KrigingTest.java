@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.xu.geo.CRSutil;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import contour.algorithm.Kriging;
 import contour.bean.Tuple3;
 import contour.bean.Tuple5;
-import contour.common.kriging.Kriging;
 import contour.utils.CsvParser;
 
 /**

@@ -1,4 +1,4 @@
-package contour.common.kriging;
+package contour.utils;
 
 /**
  * MathsUtil

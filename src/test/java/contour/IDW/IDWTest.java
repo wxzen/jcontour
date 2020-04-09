@@ -8,7 +8,6 @@ import java.util.Map;
 import org.junit.Test;
 
 import contour.bean.Tuple5;
-import contour.draw.IDWImage;
 import contour.utils.CsvParser;
 
 /**
@@ -20,7 +19,7 @@ public class IDWTest {
     @Test
     public void testZhangzhouCity() {
         double[] mapCenter = {117.661801, 24.510897};
-        int zoom = 8;
+        int zoom = 10;
         double clientWidth = 1536d;
         double clientHeight = 731d;
 
@@ -81,15 +80,15 @@ public class IDWTest {
         String dataPath = this.getClass().getClassLoader()
             .getResource(path+"data.csv").getPath();
         List<Map<String, String>> dataList = CsvParser.parse(dataPath);
-        double[][] retList = new double[3][dataList.size()];
+        double[][] retList = new double[dataList.size()][3];
         for (int i=0; i<dataList.size(); i++) {
             Map<String, String> map = dataList.get(i);
 			Double lon = Double.parseDouble(map.get("LON").trim());
 			Double lat = Double.parseDouble(map.get("LAT").trim());
             Double value = Double.parseDouble(map.get("VALUE").trim());
-            retList[0][i] = lon;
-            retList[1][i] = lat;
-            retList[2][i] = value;
+            retList[i][0] = lon;
+            retList[i][1] = lat;
+            retList[i][2] = value;
         }
         return retList;
     }

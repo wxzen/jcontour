@@ -3,8 +3,8 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>java.contour</groupId>
-    <artifactId>java-contour</artifactId>
+    <groupId>jcontour</groupId>
+    <artifactId>jcontour</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -12,13 +12,6 @@
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/org.meteothink/wContour -->
-        <!-- maven 这个 jar 包计算的时候有点问题 -->
-        <!--<dependency>-->
-            <!--<groupId>org.meteothink</groupId>-->
-            <!--<artifactId>wContour</artifactId>-->
-            <!--<version>1.6.1</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
@@ -35,15 +28,10 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>nl.cloudfarming.client</groupId>
-            <artifactId>lib-geotools</artifactId>
-            <version>2.7.4</version>
-        </dependency>
     </dependencies>
 
     <build>
-        <finalName>java-contour</finalName>
+        <finalName>jcontour</finalName>
         <plugins>
             <!-- 用于编译的plugin -->
             <plugin>

@@ -1,4 +1,4 @@
-package contour.draw;
+package contour.IDW;
 
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -26,11 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import contour.bean.Tuple5;
-import contour.common.IDW.IDWutil;
+import contour.draw.spatial.PointD;
+import contour.draw.spatial.PolyLine;
+import contour.draw.spatial.Polygon;
 import contour.utils.MapUtils;
-import wContour.Global.PointD;
-import wContour.Global.PolyLine;
-import wContour.Global.Polygon;
 
 /**等值线图片工具类, 主要负责根据算法得到的数据进行等值线（面）的绘制工作
  * ContourImage
@@ -38,12 +37,16 @@ import wContour.Global.Polygon;
  */
 public class IDWImage {
 	private Logger logger = LoggerFactory.getLogger(IDWImage.class);
+	// 经纬度以 “点 ” 的形式展示控制
+	private DrawStyle stationStyle = new DrawStyle(false, 10, Color.RED);
 	// 等值线值 显示控制、大小控制
 	private DrawStyle line_value_style = new DrawStyle(false, 40, Color.BLACK);
 	// 等值线是否绘制 、样式控制
 	private DrawStyle line_style = new DrawStyle(false, 1, Color.ORANGE);
 	// 是否填充等值线
 	private boolean fillContour = true;
+	//是否显示点位值
+	private boolean showPointValue = false;
 	// 色标
 	private Color[] colorArray;
 	// 色标值
@@ -65,6 +68,8 @@ public class IDWImage {
 
 	private CRSutil crsUtil;
 
+	private double[][] data;
+
 	private List<Polygon> contourPolygons;
 	private LinkedHashMap<Double, Color> colorMap;
 	private String filePath;
@@ -81,6 +86,8 @@ public class IDWImage {
 		this.bottom = bounds[0][1];
 		this.right = bounds[1][0];
 		this.top = bounds[1][1];
+
+		this.data = rawdata;
 
 		this.outLine = MapUtils.readMapData(mapDataPath);
 
@@ -106,10 +113,11 @@ public class IDWImage {
 	public void draw(){
 		String tmpPath = this.filePath + "_tmp";
 		try {
-			logger.info("paint basic picture .....");
+			logger.info("paint basic picture ...");
 			drawBasic(tmpPath);
-			logger.info("paint contour picture .....");
+			logger.info("paint contour picture ...");
 			drawContour(filePath, tmpPath);
+			logger.info("draw stations ...");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -123,7 +131,8 @@ public class IDWImage {
 		for (Tuple5<Double, Double, Integer, Integer, Integer> color : colors) {
 			double value_min = color._1;
 			colorValues[count] = value_min;
-			colorArray[count] = new Color(color._3, color._4, color._5, 100);
+			colorArray[count] = new Color(color._3, color._4, color._5);
+			// colorArray[count] = new Color(color._3, color._4, color._5, 100);
 			count++;
 		}
 		colorMap = new LinkedHashMap<>();
@@ -160,6 +169,10 @@ public class IDWImage {
 		// 绘制等值面以及等值线
 		if ((fillContour || line_style.show) && contourPolygons.size() > 0){
 			drawPolygon(g2, contourPolygons);
+		}
+
+		if(stationStyle.show){
+			drawStation(g2);
 		}
 
 		// 重新打开等值面区域图像
@@ -260,8 +273,30 @@ public class IDWImage {
 			polygonLine(g, line.PointList, fillColor, lineColor, lineSize, line_value_style.size, null);
 		}
 	}
-    
 
+	public void drawStation(Graphics2D g){
+        if (data != null) {
+			Point origin = CRSutil.toPoint(0, 0);
+			Point topLeftPixel = this.crsUtil.lngLatToPixelPoint(CRSutil.toLngLat(left, top));
+			Point offset = origin.clone().subtract(topLeftPixel);
+			int len = data[0].length;
+			for (int i = 0; i < len; i++) {
+				Point p = crsUtil.lngLatToPixelPoint(CRSutil.toLngLat(data[0][i], data[1][i]));
+				p.add(offset);
+				g.setColor(stationStyle.color);
+				g.fillOval((int)Math.round(p.x),  (int)Math.round(p.y), stationStyle.size, stationStyle.size);
+				if(showPointValue){
+					g.setColor(Color.black);
+					g.setFont(new Font("微软雅黑", Font.PLAIN, 10));
+					g.drawString(data[2][i]+"", (int)Math.round(p.x),  (int)Math.round(p.y));
+				}
+			}
+		}
+	}
+	
+
+
+    
     class DrawStyle {
         public boolean show;
         public int size;
