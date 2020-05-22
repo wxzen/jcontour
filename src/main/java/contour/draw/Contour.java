@@ -253,7 +253,7 @@ public class Contour {
                     rb = S2[i - 1][j + 1];
                     lt = S2[i + 1][j - 1];
                     rt = S2[i + 1][j + 1];
-                    //---- Cross point with two boder lines, will be used twice.
+                    //---- Cross point with two border lines, will be used twice.
                     if (l == 1 && r == 1 && b == 1 && t == 1 && ((lb == 0 && rt == 0) || (rb == 0 && lt == 0))) {
                         UNum[i][j] = 2;
                     } else {

@@ -47,16 +47,20 @@ public class IDWutil {
         double[] x = new double[DEFAULT_ALGORITHM_ROWS];
 		double[] y = new double[DEFAULT_ALGORITHM_COLS];
         int neighborNumber = colorValues.length - 1;
+        if(neighborNumber>data.length){
+            neighborNumber = data.length;
+        }
         
         // 填充数据
 		IDW.createGridXY_Num(left, bottom, right, top, x, y);
-		double[][] gridData = IDW.interpolation_IDW_Neighbor(
-				data, x, y, neighborNumber, DEFAULT_ALGORITHM_UNDEFINE);
-
+		// double[][] gridData = IDW.interpolation_IDW_Neighbor(
+        //         data, x, y, neighborNumber, DEFAULT_ALGORITHM_UNDEFINE);
+		double[][] gridData = IDW.interpolation_IDW_Radius(
+                data, x, y, neighborNumber, 100, DEFAULT_ALGORITHM_UNDEFINE);
+        
 		int nc = colorValues.length;
 		int[][] S1 = new int[gridData.length][gridData[0].length];
 
-		// 训练等值线
 		List<Border> borders = Contour.tracingBorders(gridData, x, y, S1, DEFAULT_ALGORITHM_UNDEFINE);
 		List<PolyLine> contourLines = Contour.tracingContourLines(gridData, x, y, nc,
 				colorValues, DEFAULT_ALGORITHM_UNDEFINE, borders, S1);
@@ -64,13 +68,12 @@ public class IDWutil {
 		// 平滑处理
 		contourLines = Contour.smoothLines(contourLines);
 
-		// 训练等值面
 		List<Polygon> contourPolygons = Contour.tracingPolygons(gridData, contourLines,
 				borders, colorValues);
 		Collections.sort(contourPolygons, new Comparator<Polygon>() {
 			@Override
 			public int compare(Polygon o1, Polygon o2) {
-				return Double.compare(o1.LowValue, o2.LowValue);
+				return Double.compare(o2.Area, o1.Area);
 			}
         });
         

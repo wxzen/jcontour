@@ -38,11 +38,11 @@ import contour.utils.MapUtils;
 public class IDWImage {
 	private Logger logger = LoggerFactory.getLogger(IDWImage.class);
 	// 经纬度以 “点 ” 的形式展示控制
-	private DrawStyle stationStyle = new DrawStyle(false, 10, Color.RED);
+	private DrawStyle stationStyle = new DrawStyle(true, 10, Color.RED);
 	// 等值线值 显示控制、大小控制
-	private DrawStyle line_value_style = new DrawStyle(false, 40, Color.BLACK);
+	private DrawStyle line_value_style = new DrawStyle(true, 40, Color.BLACK);
 	// 等值线是否绘制 、样式控制
-	private DrawStyle line_style = new DrawStyle(false, 1, Color.ORANGE);
+	private DrawStyle line_style = new DrawStyle(true, 1, Color.ORANGE);
 	// 是否填充等值线
 	private boolean fillContour = true;
 	//是否显示点位值
@@ -117,7 +117,7 @@ public class IDWImage {
 			drawBasic(tmpPath);
 			logger.info("paint contour picture ...");
 			drawContour(filePath, tmpPath);
-			logger.info("draw stations ...");
+			// logger.info("draw stations ...");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -136,7 +136,7 @@ public class IDWImage {
 			count++;
 		}
 		colorMap = new LinkedHashMap<>();
-		for (int i = 0, len = colorValues.length-1; i < len; i++) {
+		for (int i = 0, len = colorValues.length; i < len; i++) {
 			colorMap.put(colorValues[i], colorArray[i]);
 		}
 	}
@@ -233,11 +233,7 @@ public class IDWImage {
 			yPoints[j] = (int)Math.round(p.y);
 		}
 		java.awt.Polygon polygon = new java.awt.Polygon(xPoints, yPoints, len);
-		// 填充等值面
-		if (fillColor != null) {
-			g.setColor(fillColor);
-			g.fillPolygon(polygon);
-		}
+		
 		// 绘制等值线
 		if (lineColor != null) {
 			BasicStroke bs = new BasicStroke(lineSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
@@ -251,13 +247,36 @@ public class IDWImage {
 				g.drawString(msg, xPoints[len / 2], yPoints[len / 2]);
 			}
 		}
+
+		// 填充等值面
+		if (fillColor != null) {
+			g.setColor(fillColor);
+			// g.setColor(null);
+			g.fillPolygon(polygon);
+		}
+	}
+
+	private Color getSpecifyColor(double value){
+		Color _color = colorMap.get(value);
+		// if(_color==null){
+		// 	for(int i=0, len=colorValues.length; i<len; i++){
+		// 		if(colorValues[i]>value && i-1 >=0){
+		// 			_color = colorArray[i-1];
+		// 			break;
+		// 		}
+		// 	}
+		// }
+		return _color;
 	}
 
     public void drawPolygon(Graphics2D g, List<Polygon> polygons) {
 		Color lineColor = line_style.show ? line_style.color : null;
 		int lineSize = line_style.size;
+		int n = 0;
 		for (Polygon polygon : polygons) {
-			Color fillColor = fillContour ? colorMap.get(polygon.LowValue) : null;
+			// if(n>5) break;
+			Color fillColor = fillContour ? getSpecifyColor(polygon.LowValue) : null;
+			lineColor = colorMap.get(polygon.LowValue);
 			if (!polygon.IsHighCenter) {
 				Color tmp = colorArray[0];
 				for (Color c : colorArray) {
@@ -271,6 +290,7 @@ public class IDWImage {
 			}
 			PolyLine line = polygon.OutLine;
 			polygonLine(g, line.PointList, fillColor, lineColor, lineSize, line_value_style.size, null);
+			n++;
 		}
 	}
 

@@ -36,11 +36,19 @@ public class IDWTest {
         double top = 25.402349;
 
         String filePath = "contour/city/zhangzhou/";
-        
+        // String timestamp = "2020-04-07-1700";
+        // String timestamp = "2020-04-21-0800";       
+        // String timestamp = "2020-04-20-1900";       
+        // String timestamp = "2020-04-20-0500";       
+        // String timestamp = "2020-04-20-1600";       
+        // String timestamp = "2020-04-22-0700";       
+        // String timestamp = "2020-04-22-0000";       
+        String timestamp = "2020-04-27-1900";       
+        // String timestamp = "2020-05-06-1600";       
         double[][] bounds = {{left, bottom}, {right, top}};
         List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
-        double[][] rawdata = getData(filePath);
-        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "E:/tmp/zhangzhou", filePath, crsParams);
+        double[][] rawdata = getData(filePath, timestamp);
+        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "D:/tmp/zhangzhou-"+timestamp, filePath, crsParams);
         idwImage.draw();
         
     }
@@ -69,16 +77,23 @@ public class IDWTest {
         
         double[][] bounds = {{left, bottom}, {right, top}};
         List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
-        double[][] rawdata = getData(filePath);
-        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "E:/tmp/country", filePath, crsParams);
+        double[][] rawdata = getData(filePath, "");
+        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "D:/tmp/country", filePath, crsParams);
         idwImage.draw();
         
     }
 
 
-    public double[][] getData(String path){
+    public double[][] getData(String path, String timestamp){
+        String _path = "";
+        if(!"".equals(timestamp) && timestamp!=null){
+            _path = path+"data-"+timestamp+".csv";
+        }else{
+            _path = path+"data.csv";
+        }
+        System.out.println(_path);
         String dataPath = this.getClass().getClassLoader()
-            .getResource(path+"data.csv").getPath();
+            .getResource(_path).getPath();
         List<Map<String, String>> dataList = CsvParser.parse(dataPath);
         double[][] retList = new double[dataList.size()][3];
         for (int i=0; i<dataList.size(); i++) {

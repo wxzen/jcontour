@@ -1,7 +1,3 @@
-/*
- * Copyright 2012 Yaqiang Wang,
- * yaqiang.wang@gmail.com
- */
 package contour.algorithm;
 
 import java.awt.geom.Point2D;
@@ -17,6 +13,14 @@ import contour.algorithm.KDTree.Euclidean;
  * @version $Revision: 1.6 $
  */
 public class IDW {
+    /**
+     * 像元x
+     */
+    private double xDelt;
+    /**
+     * 像元y
+     */
+    private double yDelt;
 
     // <editor-fold desc="IDW">
     /**
@@ -73,6 +77,8 @@ public class IDW {
         for (i = 0; i < Ynum; i++) {
             Y[i] = Ylb + i * YDelt;
         }
+        System.out.println("像元XDelt"+XDelt);
+        System.out.println("像元YDelt"+YDelt);
     }
 
     /**
@@ -172,14 +178,12 @@ public class IDW {
         int rowNum, colNum, pNum;
         colNum = X.length;
         rowNum = Y.length;
-        pNum = SCoords.length;
+        pNum = SCoords.length; //sample data length
         double[][] GCoords = new double[rowNum][colNum];
         int i, j, p, l, aP;
         double w, SV, SW, aMin;
-        int points;
-        points = NumberOfNearestNeighbors;
         double[] AllWeights = new double[pNum];
-        double[][] NW = new double[2][points];
+        double[][] NW = new double[2][NumberOfNearestNeighbors];//存储K近邻样本权值和权值索引
         int NWIdx;
 
         //---- Do interpolation with IDW method 
@@ -189,7 +193,11 @@ public class IDW {
                 SV = 0;
                 SW = 0;
                 NWIdx = 0;
-                for (p = 0; p < pNum; p++) {
+
+                //check
+                // if(x[j]-SCoords[pNum-1][1])
+
+                for (p = 0; p < pNum; p++) {//遍历样本数据
                     if (SCoords[p][2] == unDefData) {
                         AllWeights[p] = -1;
                         continue;
@@ -200,16 +208,16 @@ public class IDW {
                     } else {
                         w = 1 / (Math.pow(X[j] - SCoords[p][0], 2) + Math.pow(Y[i] - SCoords[p][1], 2));
                         AllWeights[p] = w;
-                        if (NWIdx < points) {
-                            NW[0][NWIdx] = w;
-                            NW[1][NWIdx] = p;
+                        if (NWIdx < NumberOfNearestNeighbors) {//暂时取前NumberOfNearestNeighbors个计算的权重值和索引
+                            NW[0][NWIdx] = w;  //权重值
+                            NW[1][NWIdx] = p;  //权重值在AllWeights中的索引
                         }
                         NWIdx += 1;
                     }
                 }
 
                 if (GCoords[i][j] == unDefData) {
-                    for (p = 0; p < pNum; p++) {
+                    for (p = 0; p < pNum; p++) {//将NW中的n个权重替换成AllWeights中n个较大的值
                         w = AllWeights[p];
                         if (w == -1) {
                             continue;
@@ -217,7 +225,7 @@ public class IDW {
 
                         aMin = NW[0][0];
                         aP = 0;
-                        for (l = 1; l < points; l++) {
+                        for (l = 1; l < NumberOfNearestNeighbors; l++) {//求NW中的最小权重值aMin和索引aP
                             if ((double) NW[0][l] < aMin) {
                                 aMin = (double) NW[0][l];
                                 aP = l;
@@ -228,11 +236,11 @@ public class IDW {
                             NW[1][aP] = p;
                         }
                     }
-                    for (p = 0; p < points; p++) {
-                        SV += (double) NW[0][p] * SCoords[(int) NW[1][p]][2];
-                        SW += (double) NW[0][p];
+                    for (p = 0; p < NumberOfNearestNeighbors; p++) {
+                        SV += (double) NW[0][p] * SCoords[(int) NW[1][p]][2];//加权值求和
+                        SW += (double) NW[0][p]; //权重和
                     }
-                    GCoords[i][j] = SV / SW;
+                    GCoords[i][j] = SV / SW; 
                 }
             }
         }

@@ -11,6 +11,6 @@ package contour.draw.spatial;
  */
 public class IJPoint {
 
-    public int I;
-    public int J;
+    public int I; // row in matrix
+    public int J; // column in matrix
 }
