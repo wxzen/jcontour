@@ -40,10 +40,10 @@ public class IDWTest {
         // String timestamp = "2020-04-21-0800";       
         // String timestamp = "2020-04-20-1900";       
         // String timestamp = "2020-04-20-0500";       
-        // String timestamp = "2020-04-20-1600";       
+        String timestamp = "2020-04-20-1600";       
         // String timestamp = "2020-04-22-0700";       
         // String timestamp = "2020-04-22-0000";       
-        String timestamp = "2020-04-27-1900";       
+        // String timestamp = "2020-04-27-1900";       
         // String timestamp = "2020-05-06-1600";       
         double[][] bounds = {{left, bottom}, {right, top}};
         List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
