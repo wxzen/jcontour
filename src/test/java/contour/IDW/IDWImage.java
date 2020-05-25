@@ -131,8 +131,8 @@ public class IDWImage {
 		for (Tuple5<Double, Double, Integer, Integer, Integer> color : colors) {
 			double value_min = color._1;
 			colorValues[count] = value_min;
-			colorArray[count] = new Color(color._3, color._4, color._5);
-			// colorArray[count] = new Color(color._3, color._4, color._5, 100);
+			// colorArray[count] = new Color(color._3, color._4, color._5);
+			colorArray[count] = new Color(color._3, color._4, color._5, 150);
 			count++;
 		}
 		colorMap = new LinkedHashMap<>();

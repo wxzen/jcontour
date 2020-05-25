@@ -83,17 +83,17 @@ public class KrigingTest {
         String filePath = "contour/city/zhangzhou/";
         // String timestamp = "2020-04-07-1700";
         // String timestamp = "2020-04-21-0800";       
-        // String timestamp = "2020-04-20-1900";       
         // String timestamp = "2020-04-20-0500";       
-        String timestamp = "2020-04-20-1600";       
+        // String timestamp = "2020-04-20-1600";       
         // String timestamp = "2020-04-22-0700";       
         // String timestamp = "2020-04-22-0000";       
         // String timestamp = "2020-04-27-1900";       
         // String timestamp = "2020-05-06-1600";       
+        String timestamp = "2020-05-25-0900";       
         double[][] bounds = {{left, bottom}, {right, top}};
         List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
         double[][] rawdata = getData(filePath, timestamp);
-        KrigingImage krigingImage = new KrigingImage(rawdata, colors, bounds, "D:/tmp/zhangzhou-"+timestamp, filePath, crsParams);
+        KrigingImage krigingImage = new KrigingImage(rawdata, colors, bounds, "D:/tmp/zhangzhou-"+timestamp+"_k", filePath, crsParams);
         krigingImage.draw();
 	}
 
