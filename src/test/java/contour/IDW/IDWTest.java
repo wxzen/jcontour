@@ -1,5 +1,9 @@
 package contour.IDW;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +11,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import contour.algorithm.IDW;
 import contour.bean.Tuple5;
 import contour.utils.CsvParser;
 
@@ -49,7 +54,7 @@ public class IDWTest {
         double[][] bounds = {{left, bottom}, {right, top}};
         List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
         double[][] rawdata = getData(filePath, timestamp);
-        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "D:/tmp/zhangzhou-"+timestamp, filePath, crsParams);
+        IDWImage idwImage = new IDWImage(rawdata, colors, bounds, "D:/Tmp/zhangzhou-"+timestamp, filePath, crsParams);
         idwImage.draw();
         
     }
@@ -129,6 +134,64 @@ public class IDWTest {
     public void testPath(){
         String colorPath = this.getClass().getClassLoader().getResource("contour/city/zhangzhou/color.csv").getPath();
         System.out.println(colorPath);
+    }
+
+
+    @Test
+    public void testSaveInterplateGridDataToJSON(){
+        double[] mapCenter = {117.661801, 24.510897};
+        int zoom = 10;
+        double clientWidth = 1536d;
+        double clientHeight = 731d;
+
+        Map<String, Object> crsParams = new HashMap<>();
+        crsParams.put("mapCenter", mapCenter);
+        crsParams.put("zoom", zoom);
+        crsParams.put("clientWidth", clientWidth);
+        crsParams.put("clientHeight", clientHeight);
+        crsParams.put("zoom", zoom);
+
+        double left = 116.760922;
+		double right = 118.364926;
+		double bottom = 23.391427;
+        double top = 25.402349;
+
+        String filePath = "contour/city/zhangzhou/";
+        String timestamp = "2020-05-25-0900";      
+        double[][] rawdata = getData(filePath, timestamp);
+        double[] x = new double[200];
+		double[] y = new double[200];
+        int neighborNumber = 30;
+        IDW.createGridXY_Num(left, bottom, right, top, x, y);
+        double[][] gridData = IDW.interpolation_IDW_Radius(rawdata, x, y, neighborNumber, 100, -9999.0);
+        // System.out.println(gridData);
+        StringBuilder sb = new StringBuilder(40000);
+        sb.append("[");
+        for(int i=0;i<200;i++){
+            sb.append("[");
+            for(int j=0; j<200; j++){
+                sb.append(gridData[i][j]+",");
+            }
+            sb.replace(sb.length()-1, sb.length(), "],");
+        }
+        sb.replace(sb.length()-1, sb.length(), "]");
+        // System.out.println(sb.toString());
+        writeDataToDisk(sb.toString(), "D:/Tmp/data.json");
+
+    }
+
+
+    private void writeDataToDisk(String data, String filePath){
+        try{
+            File file = new File(filePath);
+            PrintStream ps = new PrintStream(new FileOutputStream(file));
+            ps.println(data);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+
+
     }
 
 
