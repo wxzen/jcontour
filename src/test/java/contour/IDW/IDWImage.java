@@ -46,7 +46,7 @@ public class IDWImage {
 	// 是否填充等值线
 	private boolean fillContour = true;
 	//是否显示点位值
-	private boolean showPointValue = false;
+	private boolean showPointValue = true;
 	// 色标
 	private Color[] colorArray;
 	// 色标值
@@ -303,12 +303,12 @@ public class IDWImage {
 			for (int i = 0; i < len; i++) {
 				Point p = crsUtil.lngLatToPixelPoint(CRSutil.toLngLat(data[0][i], data[1][i]));
 				p.add(offset);
-				g.setColor(stationStyle.color);
-				g.fillOval((int)Math.round(p.x),  (int)Math.round(p.y), stationStyle.size, stationStyle.size);
+				// g.setColor(stationStyle.color);
+				// g.fillOval((int)Math.round(p.x),  (int)Math.round(p.y), stationStyle.size, stationStyle.size);
 				if(showPointValue){
 					g.setColor(Color.black);
 					g.setFont(new Font("微软雅黑", Font.PLAIN, 10));
-					g.drawString(data[2][i]+"", (int)Math.round(p.x),  (int)Math.round(p.y));
+					g.drawString(data[i][2]+"", (int)Math.round(p.x),  (int)Math.round(p.y));
 				}
 			}
 		}

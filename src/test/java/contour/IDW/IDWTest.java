@@ -2,9 +2,10 @@ package contour.IDW;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,13 @@ import org.junit.Test;
 
 import contour.algorithm.IDW;
 import contour.bean.Tuple5;
+import contour.draw.Contour;
+import contour.draw.spatial.Border;
+import contour.draw.spatial.PointD;
+import contour.draw.spatial.PolyLine;
+import contour.draw.spatial.Polygon;
 import contour.utils.CsvParser;
+import contour.utils.PakoGzipUtils;
 
 /**
  * IDWTest
@@ -168,30 +175,107 @@ public class IDWTest {
         StringBuilder sb = new StringBuilder(40000);
         sb.append("[");
         for(int i=0;i<200;i++){
-            sb.append("[");
             for(int j=0; j<200; j++){
                 sb.append(gridData[i][j]+",");
             }
-            sb.replace(sb.length()-1, sb.length(), "],");
         }
         sb.replace(sb.length()-1, sb.length(), "]");
         // System.out.println(sb.toString());
-        writeDataToDisk(sb.toString(), "D:/Tmp/data.json");
+        writeDataToDisk(sb.toString(), "D:/Tmp/data_200x200.json");
+
+    }
+
+    @Test
+    public void testSaveContourPolygonsToJSON(){
+        double[] mapCenter = {117.661801, 24.510897};
+        int zoom = 10;
+        double clientWidth = 1536d;
+        double clientHeight = 731d;
+
+        Map<String, Object> crsParams = new HashMap<>();
+        crsParams.put("mapCenter", mapCenter);
+        crsParams.put("zoom", zoom);
+        crsParams.put("clientWidth", clientWidth);
+        crsParams.put("clientHeight", clientHeight);
+        crsParams.put("zoom", zoom);
+
+        double left = 116.760922;
+		double right = 118.364926;
+		double bottom = 23.391427;
+        double top = 25.402349;
+
+        String filePath = "contour/city/zhangzhou/";
+        String timestamp = "2020-05-25-0900";      
+        double[][] rawdata = getData(filePath, timestamp);
+        double[] x = new double[200];
+		double[] y = new double[200];
+        int neighborNumber = 30;
+        IDW.createGridXY_Num(left, bottom, right, top, x, y);
+        double[][] gridData = IDW.interpolation_IDW_Radius(rawdata, x, y, neighborNumber, 100, -9999.0);
+
+		int[][] S1 = new int[gridData.length][gridData[0].length];
+
+        double[] colorValues = new double[31];
+        for(int i=0; i<31; i++){
+            colorValues[i] = i*10;
+        }
+		List<Border> borders = Contour.tracingBorders(gridData, x, y, S1, -9999.0);
+		List<PolyLine> contourLines = Contour.tracingContourLines(gridData, x, y, 30,
+				colorValues, -9999.0, borders, S1);
+
+		// 平滑处理
+		contourLines = Contour.smoothLines(contourLines);
+
+		List<Polygon> contourPolygons = Contour.tracingPolygons(gridData, contourLines,
+				borders, colorValues);
+		Collections.sort(contourPolygons, new Comparator<Polygon>() {
+			@Override
+			public int compare(Polygon o1, Polygon o2) {
+				return Double.compare(o2.Area, o1.Area);
+			}
+        });
+
+        StringBuilder sb = new StringBuilder(40000);
+        sb.append("[");
+        // int count = 0;
+        for(Polygon polygon : contourPolygons){
+            // if(count==2) break;
+            sb.append("{");
+            sb.append("\"area\":");
+            sb.append(polygon.Area);
+            sb.append(",\"value\":");
+            sb.append(polygon.LowValue);
+            sb.append(",\"isHighCenter\":");
+            sb.append(polygon.IsHighCenter);
+            sb.append(",\"lnglats\":[");
+            for(PointD point: polygon.OutLine.PointList){
+                sb.append("[");
+                sb.append(point.X);
+                sb.append(",");
+                sb.append(point.Y);
+                sb.append("],");
+            }
+            sb.replace(sb.length()-1, sb.length(), "]},");
+            // count++;
+        }
+        sb.replace(sb.length()-1, sb.length(), "]");
+        writeDataToDisk(sb.toString(), "D:/Tmp/contour_polygons.json");
 
     }
 
 
     private void writeDataToDisk(String data, String filePath){
+        PrintStream ps = null;
         try{
             File file = new File(filePath);
-            PrintStream ps = new PrintStream(new FileOutputStream(file));
-            ps.println(data);
+            ps = new PrintStream(new FileOutputStream(file));
+            // ps.println(data);
+            ps.println(PakoGzipUtils.compress(data));
         }catch(Exception e){
             e.printStackTrace();
+        }finally{
+            ps.close();
         }
-
-
-
     }
 
 
