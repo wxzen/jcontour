@@ -258,14 +258,14 @@ public class IDWImage {
 
 	private Color getSpecifyColor(double value){
 		Color _color = colorMap.get(value);
-		// if(_color==null){
-		// 	for(int i=0, len=colorValues.length; i<len; i++){
-		// 		if(colorValues[i]>value && i-1 >=0){
-		// 			_color = colorArray[i-1];
-		// 			break;
-		// 		}
-		// 	}
-		// }
+		if(_color==null){
+			for(int i=0, len=colorValues.length; i<len; i++){
+				if(colorValues[i]>value && i-1 >=0){
+					_color = colorArray[i-1];
+					break;
+				}
+			}
+		}
 		return _color;
 	}
 

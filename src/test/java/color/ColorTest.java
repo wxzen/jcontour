@@ -6,15 +6,21 @@ import java.util.List;
 
 import org.junit.Test;
 
+import contour.bean.Tuple5;
+import contour.utils.ColorUtils;
 import contour.utils.InterpolateRgb;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ColorTest {
+    private Logger logger = LoggerFactory.getLogger("ColorTest");
 
     @Test
     public void test1() {
-        String hexString = colorToHexValue(Color.RED);
+        System.out.println(Color.RED);
+        String hexString = ColorUtils.colorToHexValue(Color.RED);
         System.out.println("16进制字符串:" + hexString);
-        Color color = covertHexColorToRGB(hexString);
+        Color color = ColorUtils.covertHexColorToRGB(hexString);
         System.out
                 .println("16进制字符串转为颜色的ARGB值:(" + String.valueOf(color.getAlpha()) + "," + String.valueOf(color.getRed())
                         + "," + String.valueOf(color.getGreen()) + "," + String.valueOf(color.getBlue()) + ")");
@@ -23,7 +29,7 @@ public class ColorTest {
     @Test
     public void test2() {
         String hexColor = "#00E400";
-        Color color = covertHexColorToRGB(hexColor.substring(1));
+        Color color = ColorUtils.covertHexColorToRGB(hexColor.substring(1));
         System.out.println("rgb(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")");
     }
 
@@ -37,8 +43,8 @@ public class ColorTest {
         List<int[]> colorList = new ArrayList<>(100);
         InterpolateRgb interpolate = null;
         for (int i = 0; i < baseColors.length - 1; i++) {
-            Color startColor = covertHexColorToRGB(baseColors[i]);
-            Color endColor = covertHexColorToRGB(baseColors[i + 1]);
+            Color startColor = ColorUtils.covertHexColorToRGB(baseColors[i]);
+            Color endColor = ColorUtils.covertHexColorToRGB(baseColors[i + 1]);
             interpolate = new InterpolateRgb(startColor, endColor);
             for (int j = 0; j <= 100; j++) {
                 Color color = interpolate.get((float) j / 100);
@@ -51,35 +57,20 @@ public class ColorTest {
 
     }
 
-    private static String colorToHexValue(Color color) {
-        return intToHexValue(color.getAlpha()) + intToHexValue(color.getRed()) + intToHexValue(color.getGreen())
-                + intToHexValue(color.getBlue());
+
+    @Test
+    public void test4() {
+        // Color beginColor = ColorUtils.covertHexColorToRGB("#0021FF");
+        // Color endColor = ColorUtils.covertHexColorToRGB("#00FCFE");
+        Color sColor = new Color(0,228,0);
+        Color eColor = new Color(255,255,9);
+        List<Tuple5<Double, Double, Integer, Integer, Integer>> list = ColorUtils.buildInterpolationColors(sColor, eColor, new int[]{0, 50}, 10);
+        logger.info("VALUE_MIN,VALUE_MAX,R,G,B");
+        for(Tuple5<Double, Double, Integer, Integer, Integer> t : list){
+            logger.info(t._1+","+t._2+"|"+t._3+","+t._4+","+t._5);
+        }
+
     }
 
-    private static String intToHexValue(int number) {
-        String result = Integer.toHexString(number & 0xff);
-        while (result.length() < 2) {
-            result = "0" + result;
-        }
-        return result.toUpperCase();
-    }
-
-    private Color covertHexColorToRGB(String hexColor) {
-        String str = hexColor;
-        if ('#' == hexColor.charAt(0)) {
-            str = hexColor.substring(1);
-        }
-        if (str.length() == 8) {
-            int alpha = Integer.parseInt(str.substring(0, 2), 16);
-            int red = Integer.parseInt(str.substring(2, 4), 16);
-            int green = Integer.parseInt(str.substring(4, 6), 16);
-            int blue = Integer.parseInt(str.substring(6, 8), 16);
-            return new Color(red, green, blue, alpha);
-        } else {
-            int red = Integer.parseInt(str.substring(0, 2), 16);
-            int green = Integer.parseInt(str.substring(2, 4), 16);
-            int blue = Integer.parseInt(str.substring(4, 6), 16);
-            return new Color(red, green, blue);
-        }
-    }
+  
 }
