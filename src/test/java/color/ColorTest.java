@@ -64,7 +64,7 @@ public class ColorTest {
         // Color endColor = ColorUtils.covertHexColorToRGB("#00FCFE");
         Color sColor = new Color(0,228,0);
         Color eColor = new Color(255,255,9);
-        List<Tuple5<Double, Double, Integer, Integer, Integer>> list = ColorUtils.buildInterpolationColors(sColor, eColor, new int[]{0, 50}, 10);
+        List<Tuple5<Double, Double, Integer, Integer, Integer>> list = ColorUtils.buildInterpolationColors(sColor, eColor, new int[]{50, 100}, 10);
         logger.info("VALUE_MIN,VALUE_MAX,R,G,B");
         for(Tuple5<Double, Double, Integer, Integer, Integer> t : list){
             logger.info(t._1+","+t._2+"|"+t._3+","+t._4+","+t._5);

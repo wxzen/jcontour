@@ -69,7 +69,7 @@ public final class ColorUtils {
         for(int i=0; i<delta; i+=interval) {
             Color color = interpolate.get((float)i/delta);
             Double value_min = (double) (min+i);
-            Double value_max = (double) (i+interval);
+            Double value_max = (double) (min+i+interval);
             int r = color.getRed();
             int g = color.getGreen();
             int b = color.getBlue();
