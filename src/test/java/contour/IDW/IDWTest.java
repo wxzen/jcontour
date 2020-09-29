@@ -57,11 +57,12 @@ public class IDWTest {
 
         String filePath = "contour/city/zhangzhou/";
         // String timestamp = "2020-08-11-1000";
-        String timestamp = "2020-08-27-1200";
-        // String timestamp = "data";
+        // String timestamp = "2020-08-27-1200";
+        String timestamp = "2020-09-16-2200-tvoc";
         double[][] bounds = { { left, bottom }, { right, top } };
         // List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
-        List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = buildAQIColors();
+        // List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = buildAQIColors();
+        List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = buildTVOCColors();
 
         logger.info("VALUE_MIN,VALUE_MAX,R,G,B");
         for(Tuple5<Double, Double, Integer, Integer, Integer> t : colors){
@@ -181,12 +182,20 @@ public class IDWTest {
         retList.addAll(ColorUtils.buildInterpolationColors( new Color(255,0,0), new Color(153,0,76), new int[]{150, 200}, 20));
         retList.addAll(ColorUtils.buildInterpolationColors( new Color(153,0,76), new Color(126,0,35), new int[]{200, 300}, 20));
         retList.add(new Tuple5<Double,Double,Integer,Integer,Integer>(300D, 3000D, 126, 0, 35));
-
         return retList;
     }
 
-
-
+    
+    public List<Tuple5<Double, Double, Integer, Integer, Integer>> buildTVOCColors() {
+        List<Tuple5<Double, Double, Integer, Integer, Integer>> retList = new ArrayList<>();
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(0,228,0), new Color(255,255,0), new int[]{0, 100}, 10));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(255,255,0), new Color(255,126,0), new int[]{100, 200}, 10));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(255,126,0), new Color(255,0,0), new int[]{200, 300}, 10));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(255,0,0), new Color(153,0,76), new int[]{300, 400}, 10));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(153,0,76), new Color(153,0,35), new int[]{400, 500}, 10));
+        retList.add(new Tuple5<Double,Double,Integer,Integer,Integer>(500D, 600D, 153, 0, 35));
+        return retList;
+    }
 
 
     @Test

@@ -171,9 +171,9 @@ public class IDWImage {
 			drawPolygon(g2, contourPolygons);
 		}
 
-		if(stationStyle.show){
-			drawStation(g2);
-		}
+		// if(stationStyle.show){
+		// 	drawStation(g2);
+		// }
 
 		// 重新打开等值面区域图像
 		File file = new File(tmpPath + ".png");

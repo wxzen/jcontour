@@ -8,6 +8,8 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
+import org.junit.Test;
+
 /**
  * GraphicsTest
  */
@@ -33,6 +35,17 @@ public class GraphicsTest {
         //将绘制好的图片写入到图片
         // ImageIO.write(image, "png", new File("abc.png"));w
         
+    }
+
+
+    @Test
+    public void testCreateMask() {
+        int width = 1536;
+        int height = 731;
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D graphics = image.createGraphics();
+        graphics.setColor(new Color(255,255,255, 0));
+
     }
 
 
