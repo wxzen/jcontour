@@ -1,5 +1,6 @@
 package contour.kriging;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import contour.algorithm.Kriging;
 import contour.bean.Tuple5;
+import contour.utils.ColorUtils;
 import contour.utils.CsvParser;
 
 /**
@@ -62,9 +64,9 @@ public class KrigingTest {
 
 
 	@Test
-	public void testZhangzhouCity2(){
-		double[] mapCenter = {117.661801, 24.510897};
-		int zoom = 10;
+	public void testCounty(){
+        double[] mapCenter = { 108.07031303644182, 33.882330753596406 };
+        int zoom = 4;
         double clientWidth = 1536d;
         double clientHeight = 731d;
 
@@ -75,25 +77,16 @@ public class KrigingTest {
         crsParams.put("clientHeight", clientHeight);
         crsParams.put("zoom", zoom);
 
-        double left = 116.760922;
-		double right = 118.364926;
-		double bottom = 23.391427;
-        double top = 25.402349;
+        double left = 60.42;
+        double right = 152.48;
+        double bottom = 10.01;
+        double top = 57.35;
 
-        String filePath = "contour/city/zhangzhou/";
-        // String timestamp = "2020-04-07-1700";
-        // String timestamp = "2020-04-21-0800";       
-        // String timestamp = "2020-04-20-0500";       
-        // String timestamp = "2020-04-20-1600";       
-        // String timestamp = "2020-04-22-0700";       
-        // String timestamp = "2020-04-22-0000";       
-        // String timestamp = "2020-04-27-1900";       
-        // String timestamp = "2020-05-06-1600";       
-        String timestamp = "2020-05-25-0900";       
+        String filePath = "contour/country/";
         double[][] bounds = {{left, bottom}, {right, top}};
-        List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = getColors(filePath);
-        double[][] rawdata = getData(filePath, timestamp);
-        KrigingImage krigingImage = new KrigingImage(rawdata, colors, bounds, "D:/tmp/zhangzhou-"+timestamp+"_k", filePath, crsParams);
+        List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = buildAQIColors();;
+        double[][] rawdata = getData(filePath, "");
+        KrigingImage krigingImage = new KrigingImage(rawdata, colors, bounds, "D:/tmp/", filePath, crsParams);
         krigingImage.draw();
 	}
 
@@ -136,5 +129,15 @@ public class KrigingTest {
 		return retList;
     }
 
-    
+ 
+    public List<Tuple5<Double, Double, Integer, Integer, Integer>> buildAQIColors() {
+        List<Tuple5<Double, Double, Integer, Integer, Integer>> retList = new ArrayList<>();
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(0,228,0), new Color(255,255,9), new int[]{0, 50}, 10));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(255,255,9), new Color(255,126,0), new int[]{50, 100}, 15));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(255,126,0), new Color(255,0,0), new int[]{100, 150}, 20));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(255,0,0), new Color(153,0,76), new int[]{150, 200}, 20));
+        retList.addAll(ColorUtils.buildInterpolationColors( new Color(153,0,76), new Color(126,0,35), new int[]{200, 300}, 20));
+        retList.add(new Tuple5<Double,Double,Integer,Integer,Integer>(300D, 3000D, 126, 0, 35));
+        return retList;
+    }
 }

@@ -38,11 +38,11 @@ import contour.utils.MapUtils;
 public class IDWImage {
 	private Logger logger = LoggerFactory.getLogger(IDWImage.class);
 	// 经纬度以 “点 ” 的形式展示控制
-	private DrawStyle stationStyle = new DrawStyle(true, 10, Color.RED);
+	private DrawStyle stationStyle = new DrawStyle(false, 10, Color.RED);
 	// 等值线值 显示控制、大小控制
-	private DrawStyle line_value_style = new DrawStyle(true, 40, Color.BLACK);
+	private DrawStyle line_value_style = new DrawStyle(false, 40, Color.BLACK);
 	// 等值线是否绘制 、样式控制
-	private DrawStyle line_style = new DrawStyle(true, 1, Color.ORANGE);
+	private DrawStyle line_style = new DrawStyle(false, 1, Color.ORANGE);
 	// 是否填充等值线
 	private boolean fillContour = true;
 	//是否显示点位值
@@ -276,7 +276,7 @@ public class IDWImage {
 		for (Polygon polygon : polygons) {
 			// if(n>5) break;
 			Color fillColor = fillContour ? getSpecifyColor(polygon.LowValue) : null;
-			lineColor = colorMap.get(polygon.LowValue);
+			// lineColor = colorMap.get(polygon.LowValue);
 			if (!polygon.IsHighCenter) {
 				Color tmp = colorArray[0];
 				for (Color c : colorArray) {
