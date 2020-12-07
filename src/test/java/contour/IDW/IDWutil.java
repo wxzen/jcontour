@@ -42,11 +42,12 @@ public class IDWutil {
         this.bottom = bottom;
     }
 
-    public List<Polygon> interpolate(){
+    public List<Polygon> interpolate() {
         logger.info("IDW算法开始插值...");
         double[] x = new double[DEFAULT_ALGORITHM_ROWS];
 		double[] y = new double[DEFAULT_ALGORITHM_COLS];
         int neighborNumber = colorValues.length - 1;
+        neighborNumber = 10;
         if(neighborNumber>data.length){
             neighborNumber = data.length;
         }
@@ -57,6 +58,7 @@ public class IDWutil {
         //         data, x, y, neighborNumber, DEFAULT_ALGORITHM_UNDEFINE);
 		double[][] gridData = IDW.interpolation_IDW_Radius(
                 data, x, y, neighborNumber, 100, DEFAULT_ALGORITHM_UNDEFINE);
+        // double[][] gridData = IDW.interpolation_IDW(data, x, y, 15, 10, 0.01585995, 0.01585995, 0, 0 );
         
 		int nc = colorValues.length;
 		int[][] S1 = new int[gridData.length][gridData[0].length];

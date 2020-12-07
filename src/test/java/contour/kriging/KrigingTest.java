@@ -65,28 +65,17 @@ public class KrigingTest {
 
 	@Test
 	public void testCounty(){
-        double[] mapCenter = { 108.07031303644182, 33.882330753596406 };
         int zoom = 4;
-        double clientWidth = 1536d;
-        double clientHeight = 731d;
-
-        Map<String, Object> crsParams = new HashMap<>();
-        crsParams.put("mapCenter", mapCenter);
-        crsParams.put("zoom", zoom);
-        crsParams.put("clientWidth", clientWidth);
-        crsParams.put("clientHeight", clientHeight);
-        crsParams.put("zoom", zoom);
-
         double left = 60.42;
         double right = 152.48;
         double bottom = 10.01;
         double top = 57.35;
 
-        String filePath = "contour/country/";
+        String filePath = "contour/";
         double[][] bounds = {{left, bottom}, {right, top}};
         List<Tuple5<Double, Double, Integer, Integer, Integer>> colors = buildAQIColors();;
         double[][] rawdata = getData(filePath, "");
-        KrigingImage krigingImage = new KrigingImage(rawdata, colors, bounds, "D:/tmp/", filePath, crsParams);
+        KrigingImage krigingImage = new KrigingImage(rawdata, colors, bounds, "D:/tmp/", filePath, zoom);
         krigingImage.draw();
 	}
 

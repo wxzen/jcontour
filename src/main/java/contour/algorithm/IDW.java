@@ -2,6 +2,8 @@ package contour.algorithm;
 
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import contour.algorithm.KDTree.Euclidean;
@@ -13,15 +15,6 @@ import contour.algorithm.KDTree.Euclidean;
  * @version $Revision: 1.6 $
  */
 public class IDW {
-    /**
-     * 像元x
-     */
-    private double xDelt;
-    /**
-     * 像元y
-     */
-    private double yDelt;
-
     // <editor-fold desc="IDW">
     /**
      * Create grid x/y coordinate arrays with x/y delt
@@ -81,6 +74,131 @@ public class IDW {
         System.out.println("像元YDelt"+YDelt);
     }
 
+    static List<List<Object[]>> searchPointsInRange(double[][] sCoords, 
+            double[] center, 
+            double longSemiAxisWidth,
+            double shortSemiAxisWidth) {
+        List<Object[]> allPoints = new ArrayList<>();
+        List<Object[]> inRangePoints = new ArrayList<>();
+        double distance;
+        double ssawSquare = shortSemiAxisWidth * shortSemiAxisWidth;
+        double lsawSquare = longSemiAxisWidth * longSemiAxisWidth;
+
+        for(int i = 0, len = sCoords.length; i < len; i++) {
+            double px = sCoords[i][0];
+            double py = sCoords[i][1];
+            distance = Math.pow(center[0]-px, 2) + Math.pow(center[1]-py, 2);
+            if(ssawSquare*(px-center[0])*(px-center[0]) + lsawSquare*(py-center[1])*(py-center[1])
+                 < ssawSquare*lsawSquare){
+                inRangePoints.add(new Object[]{
+                    sCoords[i],
+                    1/distance
+                });
+            }
+            allPoints.add(new Object[]{
+                        sCoords[i],
+                        1/distance
+                    });
+
+        }
+
+        allPoints.sort(new Comparator<Object[]>(){
+			@Override
+			public int compare(Object[] o1, Object[] o2) {
+                return Double.compare((double)o2[1], (double)o1[1]);
+			}
+        });
+        inRangePoints.sort(new Comparator<Object[]>(){
+			@Override
+			public int compare(Object[] o1, Object[] o2) {
+                return Double.compare((double)o2[1], (double)o1[1]);
+			}
+        });
+        
+		return Arrays.asList(inRangePoints, allPoints);
+    }
+
+
+    /**
+     * 
+     * @param SCoords
+     * @param X
+     * @param Y
+     * @param maxNumberOfNearestNeighbors 最大相邻要素数
+     * @param minNumberOfNearestNeighbors 最小相邻要素数
+     * @param longSemiAxisWidth  长半轴长度
+     * @param shortSemiAxisWidth 短半轴长度
+     * @param sectorNum 扇区数量
+     * @param sectorOffsetDegree 扇区偏移角度
+     * @return
+     */
+    public static double[][] interpolation_IDW(double[][] SCoords, 
+                double[]X, double[]Y, 
+                int maxNumberOfNearestNeighbors,
+                int minNumberOfNearestNeighbors,
+                double longSemiAxisWidth,
+                double shortSemiAxisWidth,
+                int sectorNum,
+                int sectorOffsetDegree) {
+        int rowNum, colNum, pNum;
+        colNum = X.length;
+        rowNum = Y.length;
+        pNum = SCoords.length;
+        double[][] GCoords = new double[rowNum][colNum];
+        int i, j, p;
+        double SV, SW;
+
+        for(i = 0; i < rowNum; i++) {
+            for(j = 0; j < colNum; j++) {
+                GCoords[i][j] = Double.MIN_VALUE;
+                SV = 0;
+                SW = 0;
+                for(p = 0; p<pNum; p++) {
+                    if(X[j] == SCoords[p][0] && Y[i] == SCoords[p][1]) {
+                        GCoords[i][j] = SCoords[p][2];
+                        break;
+                    }
+                }
+                
+                if(GCoords[i][j] == Double.MIN_VALUE) {
+                    List<List<Object[]>> pointsList = searchPointsInRange(SCoords, 
+                                            new double[]{X[i], Y[j]}, 
+                                            longSemiAxisWidth, 
+                                            shortSemiAxisWidth);
+                    List<Object[]> inRangePoints = pointsList.get(0);
+                    List<Object[]> allPoints = pointsList.get(1);
+                    List<Object[]> needPoints = null;
+                    if(inRangePoints.size()>=maxNumberOfNearestNeighbors) {//大于等于最大相邻要素数
+                        needPoints = inRangePoints.subList(0, maxNumberOfNearestNeighbors);
+                    }else if(inRangePoints.size()>=minNumberOfNearestNeighbors) {//大于等于最小相邻要素数，小于最大相邻要素数
+                        needPoints = inRangePoints;
+                    }else { //小于最小相邻要素数
+                        if(allPoints.size()>=minNumberOfNearestNeighbors) {
+                            needPoints = allPoints.subList(0, minNumberOfNearestNeighbors);
+                        } else {
+                            needPoints = allPoints;
+                        }
+                    }
+                    
+                    int len = needPoints.size();
+                    Object[] point;
+                    double weight;
+                    double[]scoord;
+                    for (p = 0; p < len; p++) {
+                        point = needPoints.get(p);
+                        scoord = (double[])point[0];
+                        weight = (double) point[1];
+                        SV += weight * scoord[2];
+                        SW += weight;
+                    }
+                    GCoords[i][j] = SV / SW;
+                }
+            }
+        }
+        
+        return GCoords;
+    }
+
     /**
      * Interpolation with IDW neighbor method
      *
@@ -99,48 +217,52 @@ public class IDW {
         double[][] GCoords = new double[rowNum][colNum];
         int i, j, p, l, aP;
         double w, SV, SW, aMin;
-        int points;
-        points = NumberOfNearestNeighbors;
+        int points = NumberOfNearestNeighbors;
         Object[][] NW = new Object[2][points];
 
         //---- Do interpolation
         for (i = 0; i < rowNum; i++) {
             for (j = 0; j < colNum; j++) {
-                GCoords[i][j] = -999.0;
+                GCoords[i][j] = Double.MIN_VALUE;
                 SV = 0;
                 SW = 0;
-                for (p = 0; p < points; p++) {
+                for (p = 0; p < points; p++) {//先取样本前points个点计算反距离和记录相应的位置所有p
                     if (X[j] == SCoords[p][0] && Y[i] == SCoords[p][1]) {
                         GCoords[i][j] = SCoords[p][2];
                         break;
                     } else {
                         w = 1 / (Math.pow(X[j] - SCoords[p][0], 2) + Math.pow(Y[i] - SCoords[p][1], 2));
-                        NW[0][p] = w;
-                        NW[1][p] = p;
+                        NW[0][p] = w;//记录权重
+                        NW[1][p] = p;//记录位置索引
                     }
                 }
-                if (GCoords[i][j] == -999.0) {
+                if (GCoords[i][j] == Double.MIN_VALUE) {
                     for (p = points; p < pNum; p++) {
-                        if (Math.pow(X[j] - SCoords[p][0], 2) + Math.pow(Y[i] - SCoords[p][1], 2) == 0) {
+                        double distance = Math.pow(X[j] - SCoords[p][0], 2) + Math.pow(Y[i] - SCoords[p][1], 2);
+                        if (distance == 0) {
                             GCoords[i][j] = SCoords[p][2];
                             break;
                         } else {
-                            w = 1 / (Math.pow(X[j] - SCoords[p][0], 2) + Math.pow(Y[i] - SCoords[p][1], 2));
                             aMin = Double.parseDouble(NW[0][0].toString());
                             aP = 0;
-                            for (l = 1; l < points; l++) {
+                            for (l = 1; l < points; l++) {//找到前points个样本点中的最小权重值（距离倒数）
                                 if (Double.parseDouble(NW[0][l].toString()) < aMin) {
                                     aMin = Double.parseDouble(NW[0][l].toString());
                                     aP = l;
                                 }
                             }
-                            if (w > aMin) {
+                            w = 1 / distance;
+                            if (w > aMin) {//不断用权值大的点替换前points个点，最终实现前point个点取的是最邻近的点
                                 NW[0][aP] = w;
                                 NW[1][aP] = p;
                             }
                         }
                     }
-                    if (GCoords[i][j] == -999.0) {
+                    if (GCoords[i][j] == Double.MIN_VALUE) {
+                        /**
+                         * 根据选取的邻近的样本点计算预测的的值
+                         * z = ∑zi*(1/di) / ∑(1/di)
+                         */
                         for (p = 0; p < points; p++) {
                             SV += Double.parseDouble(NW[0][p].toString()) * SCoords[Integer.parseInt(NW[1][p].toString())][2];
                             SW += Double.parseDouble(NW[0][p].toString());
