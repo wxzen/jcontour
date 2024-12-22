@@ -12,6 +12,7 @@ import contour.utils.MathsUtil;
  * 
  * @author xuwei
  */
+
 public class Kriging {
     /**
      * 高斯模型

@@ -12,11 +12,11 @@ import contour.draw.spatial.PointD;
  */
 public class MapUtils {
 
-    public static List<List<PointD>> readMapData(String dirName){
+    public static List<List<PointD>> readMapData(String filePath){
         List<List<PointD>> _clipLines = null;
 
         try {
-            String borderPath = MapUtils.class.getClassLoader().getResource(dirName+"border.csv").getPath();
+            String borderPath = MapUtils.class.getClassLoader().getResource(filePath).getPath();
             List<Map<String, String>> borderList = CsvParser.parse(borderPath);
             _clipLines = parseMapData(borderList);
         } catch (IOException ex) {
